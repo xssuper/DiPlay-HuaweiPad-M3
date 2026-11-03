@@ -10,6 +10,19 @@
 >
 > 上游原项目地址：https://github.com/shihabal3amri/DiPlay
 
+## 本 fork — 华为平板 M3（BTV-W09）
+
+本仓库是上述 legacy 项目的个人分支，目标是让**华为平板 M3 8.4"（BTV-W09 WiFi 版）**（HiSilicon hi3650、Android 7.0 / API 24、2560×1600）作为自制车机跑通有线 CarPlay。
+
+在 legacy 基线之上的关键改动：hi3650 的 `MediaCodecList` 会上报硬件 AVC 解码器 `OMX.IMG.MSVDX.Decoder.AVC`，且系统 `createDecoderByType` 会选中它。它能正常配置，但解码速度只有 0.5~1 秒/帧，视频 backlog 看门狗反复重建解码器，屏幕一直纯绿。本 fork 的 `isKnownBrokenHardwareDecoder` 改为扫描**全部**非编码器 AVC 解码器名单（而非仅第一个），命中后改用 Google 软解 `OMX.google.h264.decoder`。
+
+本机构建注意：
+
+- 使用**已注释掉 `.hudtest` applicationId 后缀**的 debug 构建（本仓库已注释），debug APK 直接装为主应用 `com.shihab.diplay`。
+- 需要打包 MFi 认证：构建时设置 `DIPLAY_AUTH_ASSETS_DIR` 指向含 `offline-mfi/identity.pk8` + `certificate.p7b` 的目录（从官方 release APK 解出）。
+
+单机型 fork：上游 legacy 项目发新版时，本仓库会整体重新适配。
+
 为兼容的比亚迪及老旧 Android 车机提供有线（USB）及无线 CarPlay 互联支持，内置熟悉的 DiAuto 风格界面。独立应用包名：`com.shihab.diplay`。
 
 **验证边界：最低安装版本不等于真机连接保证。** 当前 T3 / Android 4.4 适配基于 API 19 软件检查和模拟器专项测试；尚未完成该 T3 车机与 iPhone 15 Pro / iOS 26.6 的 USB、蓝牙、热点、画面、声音和触控全链路验证。内置实验性附件身份的本地签名成功，也不等于 iPhone 必然认可它。专项结果见 [T3 验证记录](docs/T3-ANDROID44-VALIDATION.md)。

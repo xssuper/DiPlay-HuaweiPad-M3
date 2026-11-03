@@ -10,6 +10,33 @@
 >
 > Upstream project: https://github.com/shihabal3amri/DiPlay
 
+## This fork — Huawei MediaPad M3 (BTV-W09)
+
+Personal fork of the legacy project above, maintained to run wired CarPlay on a
+**Huawei MediaPad M3 8.4" (BTV-W09, WiFi edition)** used as a DIY head unit:
+HiSilicon hi3650, Android 7.0 (API 24), 2560×1600.
+
+The key change on top of the legacy baseline: on hi3650, `MediaCodecList`
+reports the hardware AVC decoder `OMX.IMG.MSVDX.Decoder.AVC` and the system's
+`createDecoderByType` selects it. It configures successfully but decodes at
+0.5–1 s per frame, so the video backlog watchdog resets the decoder forever
+and the screen stays solid green. This fork's `isKnownBrokenHardwareDecoder`
+scans the **full** non-encoder AVC decoder list (not just the first entry)
+and routes the stream to the Google software H.264 decoder
+(`OMX.google.h264.decoder`).
+
+Build notes for this device:
+
+- Use the **debug build with the `.hudtest` applicationId suffix commented
+  out** (this fork does that already) so the debug APK installs as the main
+  `com.shihab.diplay` app.
+- MFi auth assets must be bundled: build with `DIPLAY_AUTH_ASSETS_DIR`
+  pointing at a directory containing `offline-mfi/identity.pk8` +
+  `certificate.p7b` (extracted from an official release APK).
+
+Single-device fork: expect a re-base against the legacy project whenever it
+ships a new version.
+
 **CarPlay for compatible BYD and legacy Android head units.** Wired and wireless, with the familiar DiAuto interface. Independent app: `com.shihab.diplay`.
 
 > **BYD support scope:** These projects focus on BYD cars. They may work on other brands, but other brands are unsupported and there are no plans to add support or fix brand-specific incompatibilities.
