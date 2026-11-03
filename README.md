@@ -37,6 +37,24 @@ Build notes for this device:
 Single-device fork: expect a re-base against the legacy project whenever it
 ships a new version.
 
+## Install
+
+Prebuilt debug APK for this device is in [Releases](https://github.com/xssuper/DiPlay-HuaweiPad-M3/releases):
+
+- The app installs as **`com.shihab.diplay`** and shows as **"DiPlay"**
+  (upstream's debug build installs as `…hudtest` and shows "DiPlay HUD Test";
+  both are fixed here).
+- It is signed with the **debug key**, not the official release key. If a
+  previously-installed DiPlay exists, uninstall it first (signatures differ),
+  then install the new APK.
+- After a fresh install the app data is empty: set resolution / frame rate
+  again, and on the iPhone do **Settings → General → CarPlay** → forget the
+  old head unit and re-pair.
+- Verify the install with:
+  `adb shell dumpsys package com.shihab.diplay | grep lastUpdateTime`
+  and confirm the decoder log shows `Video: decoder=OMX.google.h264.decoder`
+  (the software fallback — the whole point of this fork).
+
 **CarPlay for compatible BYD and legacy Android head units.** Wired and wireless, with the familiar DiAuto interface. Independent app: `com.shihab.diplay`.
 
 > **BYD support scope:** These projects focus on BYD cars. They may work on other brands, but other brands are unsupported and there are no plans to add support or fix brand-specific incompatibilities.

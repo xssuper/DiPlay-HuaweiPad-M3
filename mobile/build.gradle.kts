@@ -61,6 +61,8 @@ android {
             // Local fork builds: strip the default ".hudtest" suffix so the debug
             // APK installs as the main com.shihab.diplay app (the suffix is meant
             // for the official HUD-test channel builds, not local patches).
+            // The app label is set to "DiPlay" in mobile/src/debug/AndroidManifest.xml
+            // (upstream hardcodes "DiPlay HUD Test" there).
             //applicationIdSuffix = ".hudtest"
             //versionNameSuffix = "-hud-test"
         }

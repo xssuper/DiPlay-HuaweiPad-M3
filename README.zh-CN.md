@@ -23,6 +23,17 @@
 
 单机型 fork：上游 legacy 项目发新版时，本仓库会整体重新适配。
 
+## 安装
+
+本设备的预构建 debug APK 见 [Releases](https://github.com/xssuper/DiPlay-HuaweiPad-M3/releases)：
+
+- 安装后包名为 **`com.shihab.diplay`**，应用名显示为 **「DiPlay」**（上游 debug 构建会装成 `…hudtest` 且显示「DiPlay HUD Test」，本仓库已一并修正）。
+- 用的是 **debug 签名**，不是官方 release 签名。如果设备上已装过 DiPlay，请先卸载再装（签名不同会冲突）。
+- 全新安装后应用数据为空：需重新设置分辨率 / 帧率；iPhone 上进入 **设置 → 通用 → CarPlay 车载**，忽略旧车机后重新配对。
+- 验证安装：
+  `adb shell dumpsys package com.shihab.diplay | grep lastUpdateTime`
+  并确认解码日志出现 `Video: decoder=OMX.google.h264.decoder`（软解路径——本 fork 的核心目的）。
+
 为兼容的比亚迪及老旧 Android 车机提供有线（USB）及无线 CarPlay 互联支持，内置熟悉的 DiAuto 风格界面。独立应用包名：`com.shihab.diplay`。
 
 **验证边界：最低安装版本不等于真机连接保证。** 当前 T3 / Android 4.4 适配基于 API 19 软件检查和模拟器专项测试；尚未完成该 T3 车机与 iPhone 15 Pro / iOS 26.6 的 USB、蓝牙、热点、画面、声音和触控全链路验证。内置实验性附件身份的本地签名成功，也不等于 iPhone 必然认可它。专项结果见 [T3 验证记录](docs/T3-ANDROID44-VALIDATION.md)。
