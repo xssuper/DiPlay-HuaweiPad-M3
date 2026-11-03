@@ -58,8 +58,11 @@ android {
 
     buildTypes {
         debug {
-            applicationIdSuffix = ".hudtest"
-            versionNameSuffix = "-hud-test"
+            // Local fork builds: strip the default ".hudtest" suffix so the debug
+            // APK installs as the main com.shihab.diplay app (the suffix is meant
+            // for the official HUD-test channel builds, not local patches).
+            //applicationIdSuffix = ".hudtest"
+            //versionNameSuffix = "-hud-test"
         }
         release {
             optimization {

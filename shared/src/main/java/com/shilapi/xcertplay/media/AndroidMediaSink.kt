@@ -1484,9 +1484,37 @@ private class VideoDecoder(
 
     private fun isKnownBrokenHardwareDecoder(mime: String): Boolean {
         if (mime != MediaFormat.MIMETYPE_VIDEO_AVC) return false
-        val defaultDecoder = defaultDecoderName(mime) ?: return false
-        // OMX.atc.video.decoder.avc on AutoChips AC83xx head units hangs/deadlocks when decoding dynamic bitstreams.
-        return defaultDecoder.startsWith("OMX.atc.video.decoder", ignoreCase = true)
+        val names = avcDecoderNames()
+        Log.i(TAG, "AVC decoder list for broken-decoder check (sdk=${realSdkInt()}): $names")
+        if (names.isEmpty()) return false
+        // OMX.atc.video.decoder.avc on AutoChips AC83xx head units hangs/deadlocks when decoding
+        // dynamic bitstreams; it is reported as the first (default) AVC decoder on those devices.
+        if (names.first().startsWith("OMX.atc.video.decoder", ignoreCase = true)) return true
+        // OMX.IMG.MSVDX.Decoder.AVC on HiSilicon hi3650 (e.g. Huawei BTV-W09, Android 7.0) is the
+        // decoder createDecoderByType actually selects. It configures successfully but decodes at
+        // 0.5-1 s per frame, so the backlog watchdog resets it forever and the screen stays blank
+        // green. It is not necessarily first in MediaCodecList, so scan the whole list for it. The
+        // Google software H.264 decoder (ProfileHigh, Level 4.1) handles the same stream fine.
+        return names.any { it.startsWith("OMX.IMG.MSVDX.Decoder", ignoreCase = true) }
+    }
+
+    /** All non-encoder AVC decoder names, ordered as MediaCodecList reports them. */
+    private fun avcDecoderNames(): List<String> {
+        val target = MediaFormat.MIMETYPE_VIDEO_AVC
+        if (realSdkInt() >= Build.VERSION_CODES.Q) {
+            return MediaCodecList(MediaCodecList.REGULAR_CODECS).codecInfos
+                .filter { !it.isEncoder && target in it.supportedTypes }
+                .map { it.name }
+        }
+        if (realSdkInt() >= 16) {
+            @Suppress("DEPRECATION")
+            return (0 until MediaCodecList.getCodecCount()).mapNotNull { i ->
+                @Suppress("DEPRECATION")
+                MediaCodecList.getCodecInfoAt(i)
+            }.filter { !it.isEncoder && target in it.supportedTypes }
+                .map { it.name }
+        }
+        return emptyList()
     }
 
     /**
